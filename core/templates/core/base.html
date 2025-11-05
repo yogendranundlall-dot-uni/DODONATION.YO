@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DoDonation</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Simple style for message alerts */
+        .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .alert-success { background-color: #d1fae5; color: #065f46; }
+        .alert-error { background-color: #fee2e2; color: #991b1b; }
+        .alert-info { background-color: #dbeafe; color: #1e40af; }
+        .alert-warning { background-color: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <div>
+                        <!-- Website Logo -->
+                        <a href="{% url 'index' %}" class="flex items-center py-4 px-2">
+                            <span class="font-semibold text-gray-700 text-lg">DoDonation</span>
+                        </a>
+                    </div>
+                </div>
+                <!-- Right Aligned Menu -->
+                <div class="flex items-center space-x-3">
+                    {% if user.is_authenticated %}
+                        
+                        <!-- Link for Donors to create a post -->
+                        {% if user.role == "DONOR" %}
+                            <a href="#" class="py-2 px-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300">Create Donation</a>
+                        {% endif %}
+
+                        <span class="text-gray-700">Hi, {{ user.username }}!</span>
+                        
+                        <!-- 
+                        LOGOUT FIX:
+                        This is now a <form> so it sends a POST request.
+                        This fixes the 405 Method Not Allowed error.
+                        -->
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="py-2 px-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300">Logout</button>
+                        </form>
+
+                    {% else %}
+                        <a href="{% url 'login' %}" class="py-2 px-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-300">Login</a>
+                        <a href="{% url 'register' %}" class="py-2 px-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto p-6">
+
+        <!-- 
+        REGISTRATION FIX:
+        This block will display the "Account created successfully!" message.
+        This fixes the "nothing happens" problem.
+        -->
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- This is where other pages will inject their content -->
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>

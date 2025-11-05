@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Login</h2>
+
+    <!-- Display Form Errors -->
+    {% if form.errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">Your username and password didn't match. Please try again.</span>
+        </div>
+    {% endif %}
+
+     <!-- Display Messages (e.g., from registration) -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} mb-4" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="{% url 'login' %}" class="space-y-6">
+        {% csrf_token %}
+        
+        <div>
+            <label for="id_username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" name="username" id="id_username" required
+                   class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
+        </div>
+
+        <div>
+            <label for="id_password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" name="password" id="id_password" required
+                   class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500">
+        </div>
+
+        <div>
+            <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 transition duration-300">
+                Login
+            </button>
+        </div>
+    </form>
+    
+    <p class="text-center text-gray-600 mt-6">
+        Don't have an account? 
+        <a href="{% url 'register' %}" class="font-medium text-green-600 hover:text-green-500">
+            Sign up
+        </a>
+    </p>
+</div>
+{% endblock %}
+

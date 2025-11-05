@@ -1,0 +1,151 @@
+{% extends 'core/base.html' %}
+
+{# This file no longer needs {% load form_helpers %} #}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Create an Account</h2>
+
+    <!-- Display Form Errors -->
+    {% if user_form.errors or donor_form.errors or receiver_form.errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">Please correct the errors below.</span>
+            <ul class="list-disc list-inside mt-2">
+                {% for field, errors in user_form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                 {% for field, errors in donor_form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                 {% for field, errors in receiver_form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+        
+        <!-- Section 1: User Account -->
+        <fieldset class="mb-6">
+            <legend class="text-xl font-semibold mb-4 text-gray-700">Account Details</legend>
+            <div class="space-y-4">
+                <div>
+                    <label for="{{ user_form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
+                    {{ user_form.username }}
+                </div>
+                <div>
+                    <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
+                    {{ user_form.email }}
+                </div>
+                <div>
+                    <label for="{{ user_form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
+                    {{ user_form.password1 }}
+                </div>
+                <div>
+                    <label for="{{ user_form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    {{ user_form.password2 }}
+                </div>
+                <div>
+                    <label for="{{ user_form.role.id_for_label }}" class="block text-sm font-medium text-gray-700">I am a...</label>
+                    {{ user_form.role }}
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Section 2: Donor Profile (Hidden by default) -->
+        <fieldset id="donor_profile_form" class="mb-6 hidden">
+            <legend class="text-xl font-semibold mb-4 text-gray-700">Donor Profile</legend>
+            <div class="space-y-4">
+                <div>
+                    <label for="{{ donor_form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First Name</label>
+                    {{ donor_form.first_name }}
+                </div>
+                <div>
+                    <label for="{{ donor_form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last Name</label>
+                    {{ donor_form.last_name }}
+                </div>
+                <div>
+                    <label for="{{ donor_form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700">Phone Number (Optional)</label>
+                    {{ donor_form.phone_number }}
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Section 3: Receiver Profile (Hidden by default) -->
+        <fieldset id="receiver_profile_form" class="mb-6 hidden">
+            <legend class="text-xl font-semibold mb-4 text-gray-700">Receiver (NGO) Profile</legend>
+            <p class="text-sm text-gray-600 mb-4">Your account will be reviewed by an admin upon creation.</p>
+            <div class="space-y-4">
+                <div>
+                    <label for="{{ receiver_form.ngo_name.id_for_label }}" class="block text-sm font-medium text-gray-700">NGO Name</label>
+                    {{ receiver_form.ngo_name }}
+                </div>
+                <div>
+                    <label for="{{ receiver_form.registration_number.id_for_label }}" class="block text-sm font-medium text-gray-700">NGO Registration Number</label>
+                    {{ receiver_form.registration_number }}
+                </div>
+                <div>
+                    <label for="{{ receiver_form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    {{ receiver_form.phone_number }}
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-md hover:bg-green-700 transition duration-300">
+                Create Account
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript to toggle forms -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the elements
+        const roleSelect = document.getElementById('{{ user_form.role.id_for_label }}');
+        const donorForm = document.getElementById('donor_profile_form');
+        const receiverForm = document.getElementById('receiver_profile_form');
+
+        // Function to show/hide forms based on role
+        function toggleForms() {
+            if (!roleSelect || !donorForm || !receiverForm) {
+                console.error("Error: Could not find one or more form elements.");
+                return;
+            }
+            
+            const selectedRole = roleSelect.value;
+            
+            if (selectedRole === 'DONOR') {
+                donorForm.classList.remove('hidden');
+                receiverForm.classList.add('hidden');
+            } else if (selectedRole === 'RECEIVER') {
+                donorForm.classList.add('hidden');
+                receiverForm.classList.remove('hidden');
+            } else {
+                // Hide both if no role (or admin role, etc.) is selected
+                donorForm.classList.add('hidden');
+                receiverForm.classList.add('hidden');
+            }
+        }
+
+        // Add event listener to the dropdown
+        roleSelect.addEventListener('change', toggleForms);
+
+        // Run on page load to set the correct initial form
+        toggleForms();
+    });
+</script>
+
+{% endblock %}
+
